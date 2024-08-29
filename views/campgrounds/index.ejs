@@ -1,8 +1,54 @@
-<% layout('./layouts/boilerplate.ejs') %>
-<div id="map" class="rounded" style="width: 100%; height: 500px"></div>
+<% layout('./layouts/boilerplate.ejs') %> <% if (!search ) { %>
 <h1 class="text-center display-4 mb-3">All Campgrounds</h1>
+<% } %>
 
-<% for( let i of camp ) { %>
+<div class="container-fluid mb-3">
+  <form class="d-flex" role="search" method="get" action="/campgrounds">
+    <input
+      class="form-control me-2"
+      type="search"
+      placeholder="Search campground"
+      aria-label="Search"
+      name="search"
+    />
+    <button class="btn btn-outline-success" type="submit">Search</button>
+  </form>
+</div>
+
+<div id="map" class="rounded mb-4" style="width: 100%; height: 500px"></div>
+
+<% if (search && camp.length > 0) { %>
+<h2 class="mb-3">Showing results for "<%= search %>"</h2>
+<% } %> <% if (search && camp.length == 0) { %>
+<h2 class="mb-3">No results for "<%= search %>"</h2>
+<% } %>
+
+<div class="row">
+  <% for( let i of camp ) { %>
+  <div class="col-md-3 mb-3">
+    <div class="card">
+      <img
+        src="<%= i.images[0].url %>"
+        class="img-fluid"
+        alt="..."
+        style="height: 18em; width: 25em"
+      />
+      <div class="card-body">
+        <h5 class="card-title"><%= i.title %></h5>
+        <p class="card-text"><%=i.description%></p>
+        <p class="card-text">
+          <small class="text-body-secondary"><%= i.location %></small>
+        </p>
+
+        <a href="/campgrounds/<%= i._id %>"
+          ><button class="btn btn-primary">View this campground</button></a
+        >
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+<!-- <% for( let i of camp ) { %>
 <div class="card mb-3">
   <div class="row g-0">
     <div class="col-md-4">
@@ -27,7 +73,7 @@
     </div>
   </div>
 </div>
-<% } %>
+<% } %> -->
 <script>
   const campgrounds = {features:<%-JSON.stringify(camp)%>}
 </script>

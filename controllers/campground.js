@@ -5,10 +5,28 @@ const { cloudinary } = require("../cloudinary");
 
 const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
-
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape special characters
+}
 module.exports.index = async (req, res) => {
-  const camp = await campGround.find({});
-  res.render("campgrounds/index", { camp });
+  const { search } = req.query;
+
+  let camp;
+  if (search) {
+    const escapedSearch = escapeRegExp(search); // Escape special characters
+    const regex = new RegExp(escapedSearch, "i"); // Create a case-insensitive regex
+
+    camp = await campGround.find({
+      $or: [
+        { title: regex }, // Use escaped regex for title
+        { location: regex }, // Use escaped regex for location
+      ],
+    });
+  } else {
+    camp = await campGround.find({});
+  }
+  console.log(camp);
+  res.render("campgrounds/index", { camp, search });
 };
 
 module.exports.renderNewForm = (req, res) => {
